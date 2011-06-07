@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<array name="parts">
+		<item>temperatureSensor1</item>
+		<item>temperatureSensor2</item>
+		<item>temperatureSensor3</item>
+		<item>temperatureSensor4</item>
+		<item>temperatureSensor5</item>
+		<item>temperatureSensor6</item>
+		<item>temperatureSensor7</item>
+	</array>
+</resources>

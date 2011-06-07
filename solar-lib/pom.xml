@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.entscheidungsbaum</groupId>
+	<artifactId>solar-lib</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>solar-lib</name>
+	<repositories>
+		<repository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>scala-tools.org</id>
+			<name>Scala-tools Maven2 Repository</name>
+			<url>http://scala-tools.org/repo-releases</url>
+		</pluginRepository>
+	</pluginRepositories>
+	<dependencies>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android</artifactId>
+			<version>2.1_r1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.android</groupId>
+			<artifactId>android-test</artifactId>
+			<version>2.1_r1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.scala-lang</groupId>
+			<artifactId>scala-library</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.scala-tools</groupId>
+				<artifactId>maven-scala-plugin</artifactId>
+				<version>2.13.1</version>
+				<executions>
+					<execution>
+						<id>scala-compile-first</id>
+						<phase>process-resources</phase>
+						<goals>
+							<goal>add-source</goal>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>scala-test-compile</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin><!-- 
+			<plugin>
+				<groupId>com.pyx4me</groupId>
+				<artifactId>proguard-maven-plugin</artifactId>
+				<version>2.0.4</version>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>proguard</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<maxMemory>256m</maxMemory>
+					<injar>android-classes</injar>
+					<libs>
+						<lib>${rt.jar.path}</lib>
+					</libs>
+					<obfuscate>false</obfuscate>
+					<options>
+						<option>-keep public class * extends android.app.Activity</option>
+						<option>-keep public class * extends android.app.Application</option>
+						<option>-keep public class * extends android.app.Service</option>
+						<option>-keep public class * extends
+							android.content.BroadcastReceiver</option>
+						<option>-keep public class * extends
+							android.content.ContentProvider</option>
+						<option>-dontskipnonpubliclibraryclasses</option>
+						<option>-dontoptimize</option>
+						<option>-printmapping map.txt</option>
+						<option>-printseeds seed.txt</option>
+						<option>-ignorewarnings</option>
+					</options>
+					<exclusions>
+						<exclusion>
+							<groupId>org.scala-lang</groupId>
+							<artifactId>scala-library</artifactId>
+						</exclusion>
+					</exclusions>
+				</configuration>
+			</plugin> -->
+			<plugin>
+				<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+				<artifactId>maven-android-plugin</artifactId>
+				<version>2.8.4</version>
+				<configuration>
+					<sdk>
+						<path>/opt/android-sdk-mac_x86</path>
+						<platform>8</platform>
+					</sdk>
+					<emulator>
+						<avd>22</avd>
+					</emulator>
+					<deleteConflictingFiles>true</deleteConflictingFiles>
+					<undeployBeforeDeploy>true</undeployBeforeDeploy>
+				</configuration>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3</version>
+			</plugin>
+		</plugins>
+	</build>
+	<profiles>
+		<!-- to avoid having to do symlinks to rt.jar like documented e.g. here 
+			http://bruehlicke.blogspot.com/2009/11/missing-rtjar-mac-os-x-using-proguard.html 
+			http://codebistro.com/2010/07/18/proguard-and-runtime-libraries-on-mac-os-x/ -->
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+				</os>
+			</activation>
+			<properties>
+				<rt.jar.path>${env.JAVA_HOME}/jre/lib/rt.jar</rt.jar.path>
+				<jsse.jar.path>${env.JAVA_HOME}/jre/lib/jsse.jar</jsse.jar.path>
+			</properties>
+		</profile>
+		<!-- mac profile has to be after unix since running on mac will trigger 
+			both -->
+		<profile>
+			<id>mac</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+			<properties>
+				<!-- absolute path -->
+				<rt.jar.path>/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Classes/classes.jar</rt.jar.path>
+				<!-- or with JAVA_HOME /System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Home/ -->
+				<!-- <rt.jar.path>${env.JAVA_HOME}/../Classes/classes.jar</rt.jar.path> -->
+				<!-- <jsse.jar.path>${env.JAVA_HOME}/../Classes/jsse.jar</jsse.jar.path> -->
+			</properties>
+		</profile>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+			<properties>
+				<rt.jar.path>${env.JAVA_HOME}/jre/lib/rt.jar</rt.jar.path>
+				<jsse.jar.path>${env.JAVA_HOME}/jre/lib/jsse.jar</jsse.jar.path>
+			</properties>
+		</profile>
+
+	</profiles>
+</project>
+
